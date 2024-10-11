@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Orçamento de Pintura - Rocha Pinturas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #0f3057, #1b5299);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .logo {
+            max-width: 120px;
+            height: auto;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #0741ff;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .input-group label {
+            font-weight: bold;
+            margin-right: 10px;
+            flex: 1;
+            text-align: right;
+            color: #333; /* Cor do texto */
+        }
+        .input-group input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            flex: 2;
+            width: 100%;
+            max-width: 200px;
+        }
+        .areas-container {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .areas-container .area-item {
+            margin-bottom: 10px;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .calculate-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        .calculate-button:hover {
+            background-color: #218838;
+        }
+        .resumo-container {
+            margin-top: 20px;
+            text-align: left;
+            background-color: #fff; /* Cor do fundo do resumo */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #333; /* Cor do texto no resumo */
+        }
+        .resumo-container h2 {
+            margin-bottom: 10px;
+            color: #0749ff;
+        }
+        .resumo-container .resumo-item {
+            margin-bottom: 10px;
+        }
+        .print-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            font-size: 14px;
+            color: #0720ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .link:hover {
+            color: #2c4cff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="uploads/logo.png" alt="Logo da Rocha Pinturas">
+        <h1>Orçamento de Pintura - Rocha Pinturas</h1>
+        <div class="input-group">
+            <label for="cliente">Cliente:</label>
+            <input type="text" id="cliente" name="cliente" required>
+        </div>
+        <div class="input-group">
+            <label for="valor_metro_quadrado">Valor por Metro Quadrado (R$):</label>
+            <input type="number" id="valor_metro_quadrado" name="valor_metro_quadrado" step="0.01" required>
+        </div>
+        <div class="areas-container" id="areas-container">
+            <!-- Áreas serão adicionadas dinamicamente -->
+        </div>
+        <div class="button-container">
+            <button class="calculate-button" onclick="calcularOrcamento()">Calcular Orçamento</button>
+            <button class="calculate-button" onclick="adicionarArea()">Adicionar Área</button>
+        </div>
+        <div class="resumo-container" id="resumo-container" style="display: none;">
+            <h2>Resumo do Orçamento</h2>
+            <div class="resumo-item">
+                <p><strong>Cliente:</strong> <span id="resumo-cliente"></span></p>
+                <p><strong>Valor por Metro Quadrado:</strong> R$ <span id="resumo-valor"></span></p>
+            </div>
+            <h3>Áreas:</h3>
+            <div id="resumo-areas">
+                <!-- Informações das áreas serão adicionadas aqui pelo JavaScript -->
+            </div>
+            <div class="resumo-item">
+                <hr>
+                <p><strong>Total de Metros Quadrados:</strong> <span id="resumo-total-metros"></span> m²</p>
+                <p><strong>Valor Total do Orçamento:</strong> R$ <span id="resumo-total-valor"></span></p>
+            </div>
+            <button class="print-button" onclick="window.print()">Imprimir Orçamento</button>
+            <p><a class="link" href="http://www.rochapinturas.com" target="_blank">Visite nosso site</a></p>
+        </div>
+    </div>
+
+    <script>
+        function adicionarArea() {
+            const areasContainer = document.getElementById('areas-container');
+            const novaArea = document.createElement('div');
+            novaArea.classList.add('area-item');
+            novaArea.innerHTML = `
+                <div class="input-group">
+                    <label>Nome da Área:</label>
+                    <input type="text" name="area_nome[]" required>
+                </div>
+                <div class="input-group">
+                    <label>Altura (m):</label>
+                    <input type="number" step="0.01" name="area_altura[]" required>
+                </div>
+                <div class="input-group">
+                    <label>Largura (m):</label>
+                    <input type="number" step="0.01" name="area_largura[]" required>
+                </div>
+                <hr>
+            `;
+            areasContainer.appendChild(novaArea);
+        }
+
+        function calcularOrcamento() {
+            const cliente = document.getElementById('cliente').value;
+            const valorMetroQuadrado = parseFloat(document.getElementById('valor_metro_quadrado').value);
+            const areasInputs = document.querySelectorAll('[name^="area_nome"]');
+            const areas = [];
+            let totalMetrosQuadrados = 0;
+            let totalValor = 0;
+
+            areasInputs.forEach((input, index) => {
+                const nome = input.value;
+                const altura = parseFloat(document.getElementsByName('area_altura[]')[index].value);
+                const largura = parseFloat(document.getElementsByName('area_largura[]')[index].value);
+                const valorArea = altura * largura * valorMetroQuadrado;
+                areas.push({ nome, altura, largura, valorArea });
+                totalMetrosQuadrados += altura * largura;
+                totalValor += valorArea;
+            });
+
+            // Exibir resumo do orçamento
+            exibirResumo(cliente, valorMetroQuadrado, areas, totalMetrosQuadrados, totalValor);
+        }
+
+        function exibirResumo(cliente, valorMetroQuadrado, areas, totalMetrosQuadrados, totalValor) {
+            const resumoCliente = document.getElementById('resumo-cliente');
+            const resumoValor = document.getElementById('resumo-valor');
+            const resumoAreas = document.getElementById('resumo-areas');
+            const resumoTotalMetros = document.getElementById('resumo-total-metros');
+            const resumoTotalValor = document.getElementById('resumo-total-valor');
+            const resumoContainer = document.getElementById('resumo-container');
+
+            resumoCliente.textContent = cliente;
+            resumoValor.textContent = valorMetroQuadrado.toFixed(2).replace('.', ',');
+
+            resumoAreas.innerHTML = '';
+            areas.forEach(area => {
+                const areaElement = document.createElement('p');
+                areaElement.textContent = `${area.nome}: ${area.altura} m x ${area.largura} m - Valor: R$ ${area.valorArea.toFixed(2).replace('.', ',')}`;
+                resumoAreas.appendChild(areaElement);
+            });
+
+            resumoTotalMetros.textContent = totalMetrosQuadrados.toFixed(2).replace('.', ',');
+            resumoTotalValor.textContent = totalValor.toFixed(2).replace('.', ',');
+
+            resumoContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
